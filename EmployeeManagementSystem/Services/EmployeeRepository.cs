@@ -3,7 +3,7 @@ using Microsoft.Data.SqlClient;
 
 namespace EmployeeManagementSystem.Services
 {
-    public class EmployeeRepository:IEmployeeRepository
+    public class EmployeeRepository : IEmployeeRepository
     {
         private readonly string _connectionString;
 
@@ -44,5 +44,28 @@ namespace EmployeeManagementSystem.Services
             return employees;
         }
 
+        #region "Employee Add"
+        public async Task<bool> AddEmployeeAsync(Employee employee)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = @"INSERT INTO tbl_Employee(FirstName,LastName,Email, DepartmentId,Salary, JoiningDate) VALUES(@FirstName,@LastName,@Email,@DepartmentId, @Salary, @JoiningDate)";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue(@"FirstName", employee.FirstName);
+                    cmd.Parameters.AddWithValue(@"LastName", employee.LastName);
+                    cmd.Parameters.AddWithValue(@"Email", employee.Email);
+                    cmd.Parameters.AddWithValue(@"DepartmentId", employee.DepartmentId);
+                    cmd.Parameters.AddWithValue(@"Salary", employee.Salary);
+
+                    cmd.Parameters.AddWithValue(@"JoiningDate", employee.JoiningDate);
+
+                    await conn.OpenAsync();
+                    int rowsAfftected = await cmd.ExecuteNonQueryAsync();
+                    return rowsAfftected > 0;
+                }
+            }
+        }
+        #endregion
     }
 }

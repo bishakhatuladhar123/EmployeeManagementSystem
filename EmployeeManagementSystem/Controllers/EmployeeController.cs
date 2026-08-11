@@ -1,4 +1,5 @@
-﻿using EmployeeManagementSystem.Services;
+﻿using EmployeeManagementSystem.Models;
+using EmployeeManagementSystem.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeManagementSystem.Controllers
@@ -16,6 +17,22 @@ namespace EmployeeManagementSystem.Controllers
         {
             var employees = await _repository.GetAllEmployeeAsync();
             return View(employees);
+        }
+
+        [HttpGet]
+        public IActionResult CreateEmployee()
+        {
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> CreateEmployee(Employee employee)
+        {
+            if (ModelState.IsValid)
+            {
+                bool result = await _repository.AddEmployeeAsync(employee);
+                if (result) return RedirectToAction("Index");
+            }
+            return View(employee);
         }
     }
 }
